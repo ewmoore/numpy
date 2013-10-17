@@ -1,10 +1,7 @@
 #define NPY_NO_DEPRECATED_API NPY_API_VERSION
 
 #include "Python.h"
-
-#include "npy_pycompat.h"
 #include "npy_config.h"
-#include "numpy/npy_math.h"
 
 #define CACOS 1
 #define CASIN 1
@@ -25,15 +22,15 @@
 #define HAVE_NUMPY 1
 
 #define FLOAT 1
-#include "../../test_c99complex.c"
+#include "test_c99complex.c"
 #undef FLOAT
 
 #define DOUBLE 1
-#include "../../test_c99complex.c"
+#include "test_c99complex.c"
 #undef DOUBLE
 
 #define LONGDOUBLE 1
-#include "../../test_c99complex.c"
+#include "test_c99complex.c"
 #undef LONGDOUBLE
 
 #define TESTFUNC_INT(func, suffix) \

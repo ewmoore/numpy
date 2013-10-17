@@ -233,7 +233,7 @@ def check_complex(config, mathlibs):
                 exists.extend(C99_COMPLEX_FUNCS_CHECKED)
 
             if len(exists) > 0:
-                fp = open('./numpy/core/test_c99complex.c', 'r')
+                fp = open('./numpy/core/src/npymath/test_c99complex.c', 'r')
                 obody = fp.read()
                 fp.close()
                 precname = {'f':'FLOAT', '':'DOUBLE', 'l':'LONGDOUBLE'}[prec]
@@ -1006,7 +1006,10 @@ def configuration(parent_package='',top_path=None):
 
     config.add_extension('npymath_tests',
                     sources = [join('src', 'npymath', 'npymath_tests.c')],
-                    depends = ['test_c99complex.c'],
+                    depends = [join('src', 'npymath', 'test_c99complex.c'),
+                               join('include', 'numpy', 'npy_fenv.h'),
+                               join('include', 'numpy', 'npy_math.h'),
+                               join('include', 'numpy', 'npy_3kcompat.h')],
                     libraries = ['npymath']
                     )
 
