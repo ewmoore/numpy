@@ -340,7 +340,7 @@ class TestHypotSpecialValues(TestCase):
         assert_hypot_isinf(np.inf, np.nan)
         assert_hypot_isinf(np.inf, 0)
         assert_hypot_isinf(0, np.inf)
-
+        assert_hypot_isinf(np.inf, np.inf)
 
 def assert_arctan2_isnan(x, y):
     assert_(np.isnan(ncu.arctan2(x, y)), "arctan(%s, %s) is %s, not nan" % (x, y, ncu.arctan2(x, y)))

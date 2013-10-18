@@ -192,6 +192,10 @@ double npy_hypot(double x, double y)
         }
     }
 
+    if (npy_isinf(x) || npy_isinf(y)) {
+        return NPY_INFINITY;
+    }
+
     x = npy_fabs(x);
     y = npy_fabs(y);
     if (x < y) {
