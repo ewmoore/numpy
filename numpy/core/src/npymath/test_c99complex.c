@@ -4,6 +4,9 @@
 #else
 #include <stdio.h>
 #include <math.h>
+#ifdef __SUNPRO_CC
+#include <sunmath.h>
+#endif
 #include <complex.h>
 #endif
 
