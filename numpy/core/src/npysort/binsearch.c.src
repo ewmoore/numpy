@@ -7,6 +7,12 @@
 
 #define NOT_USED NPY_UNUSED(unused)
 
+/* hack needed because we use internal api right now */
+typedef void (LocalPyArray_StridedUnaryOp)(char *dst, npy_intp dst_stride,
+                                    char *src, npy_intp src_stride,
+                                    npy_intp N, npy_intp src_itemsize,
+                                    void *transferdata);
+
 /*
  *****************************************************************************
  **                            NUMERIC SEARCHES                             **
@@ -35,15 +41,29 @@
  * #CMP  = LT, LTE#
  */
 
+ /**begin repeat2
+  *
+  * #transfer = , transfer#
+  * #use_transfer = 0, 1#
+  * #const = const, #
+  */
+
 NPY_VISIBILITY_HIDDEN void
-binsearch_@side@_@suff@(const char *arr, const char *key, char *ret,
+@transfer@binsearch_@side@_@suff@(@const@ char *arr, const char *key, char *ret,
                         npy_intp arr_len, npy_intp key_len,
                         npy_intp arr_str, npy_intp key_str, npy_intp ret_str,
+#if @use_transfer@
+                        npy_intp arr_itemsize, void *arr_trans,
+                        void *arr_data,
+#endif
                         PyArrayObject *NOT_USED)
 {
     npy_intp min_idx = 0;
     npy_intp max_idx = arr_len;
     @type@ last_key_val;
+#if @use_transfer@
+    LocalPyArray_StridedUnaryOp *transfer = arr_trans;
+#endif
 
     if (key_len == 0) {
         return;
@@ -69,7 +89,12 @@ binsearch_@side@_@suff@(const char *arr, const char *key, char *ret,
 
         while (min_idx < max_idx) {
             const npy_intp mid_idx = min_idx + ((max_idx - min_idx) >> 1);
+#if @use_transfer@
+            @type@ mid_val;
+            transfer((char*)&mid_val, 0, arr + mid_idx*arr_str, 0, 1, arr_itemsize, arr_data);
+#else
             const @type@ mid_val = *(const @type@ *)(arr + mid_idx*arr_str);
+#endif
             if (@TYPE@_@CMP@(mid_val, key_val)) {
                 min_idx = mid_idx + 1;
             }
@@ -82,16 +107,23 @@ binsearch_@side@_@suff@(const char *arr, const char *key, char *ret,
 }
 
 NPY_VISIBILITY_HIDDEN int
-argbinsearch_@side@_@suff@(const char *arr, const char *key,
+@transfer@argbinsearch_@side@_@suff@(@const@ char *arr, const char *key,
                            const char *sort, char *ret,
                            npy_intp arr_len, npy_intp key_len,
                            npy_intp arr_str, npy_intp key_str,
                            npy_intp sort_str, npy_intp ret_str,
+#if @use_transfer@
+                           npy_intp arr_itemsize, void *arr_trans,
+                           void *arr_data,
+#endif
                            PyArrayObject *NOT_USED)
 {
     npy_intp min_idx = 0;
     npy_intp max_idx = arr_len;
     @type@ last_key_val;
+#if @use_transfer@
+    LocalPyArray_StridedUnaryOp *transfer = arr_trans;
+#endif
 
     if (key_len == 0) {
         return 0;
@@ -124,7 +156,11 @@ argbinsearch_@side@_@suff@(const char *arr, const char *key,
                 return -1;
             }
 
+#if @use_transfer@
+            transfer((char*)&mid_val, 0, arr + sort_idx*arr_str, 0, 1, arr_itemsize, arr_data);
+#else
             mid_val = *(const @type@ *)(arr + sort_idx*arr_str);
+#endif
 
             if (@TYPE@_@CMP@(mid_val, key_val)) {
                 min_idx = mid_idx + 1;
@@ -138,6 +174,7 @@ argbinsearch_@side@_@suff@(const char *arr, const char *key,
     return 0;
 }
 
+/**end repeat2**/
 /**end repeat1**/
 /**end repeat**/
 
